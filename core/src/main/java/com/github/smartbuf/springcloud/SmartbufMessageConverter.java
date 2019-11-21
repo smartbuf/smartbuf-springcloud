@@ -41,6 +41,10 @@ public class SmartbufMessageConverter extends AbstractGenericHttpMessageConverte
         if (!SMARTBUF.isCompatibleWith(contentType)) {
             throw new UnsupportedOperationException("unsupported context-type: " + contentType);
         }
+
+        // InputStream has lower performance
+        // return SmartPacket.deserialize(msg.getBody(), type);
+
         byte[] bytes = IOUtils.toByteArray(msg.getBody());
         return SmartPacket.deserialize(bytes, type);
     }
@@ -54,12 +58,16 @@ public class SmartbufMessageConverter extends AbstractGenericHttpMessageConverte
         if (!SMARTBUF.isCompatibleWith(contentType)) {
             throw new UnsupportedOperationException("unsupported context-type: " + contentType);
         }
+
+        // InputStream has lower performance
+        // return SmartPacket.deserialize(msg.getBody(), cls);
+
         byte[] bytes = IOUtils.toByteArray(msg.getBody());
         return SmartPacket.deserialize(bytes, cls);
     }
 
     @Override
-    protected void writeInternal(Object o, Type type, HttpOutputMessage msg) throws IOException, HttpMessageNotWritableException {
+    protected void writeInternal(Object obj, Type type, HttpOutputMessage msg) throws IOException, HttpMessageNotWritableException {
         MediaType contentType = msg.getHeaders().getContentType();
         if (contentType == null) {
             contentType = SMARTBUF;
@@ -67,7 +75,11 @@ public class SmartbufMessageConverter extends AbstractGenericHttpMessageConverte
         if (!SMARTBUF.isCompatibleWith(contentType)) {
             throw new UnsupportedOperationException("unsupported context-type: " + contentType);
         }
-        byte[] bytes = SmartPacket.serialize(o);
+
+        // OutputStream has lower performance
+        // SmartPacket.serialize(obj, msg.getBody());
+
+        byte[] bytes = SmartPacket.serialize(obj);
         IOUtils.write(bytes, msg.getBody());
     }
 
