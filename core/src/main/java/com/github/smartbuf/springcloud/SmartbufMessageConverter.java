@@ -12,7 +12,12 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import java.io.IOException;
 
 /**
- * feign调用中protostuff编解码器
+ * Smartbuf's HttpMessageConverter adaptor.
+ * <p>
+ * It use the packet mode of 'smartbuf' to expose a better option for data encoding and decoding.
+ *
+ * @author sulin
+ * @since 2019-11-21 14:22:50
  **/
 public class SmartbufMessageConverter extends AbstractHttpMessageConverter<Object> {
 
@@ -37,7 +42,6 @@ public class SmartbufMessageConverter extends AbstractHttpMessageConverter<Objec
             throw new UnsupportedOperationException("unsupported context-type: " + contentType);
         }
         byte[] bytes = IOUtils.toByteArray(msg.getBody());
-
         return SmartPacket.deserialize(bytes, cls);
     }
 

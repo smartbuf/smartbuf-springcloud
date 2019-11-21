@@ -1,9 +1,6 @@
-server:
-  port: 8888
-
 spring:
   application:
-    name: demo
+    name: demo-test
   profiles:
     active: native
   cloud:
@@ -11,5 +8,4 @@ spring:
       host: localhost
       port: 8500
       discovery:
-        prefer-ip-address: true
-        service-name: demo
+        instance-id: demo
