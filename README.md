@@ -40,9 +40,9 @@ If the headers of the subsequent `http` requests include `accept: application/x-
 The whole process is similar to the implementation of `application/json`, expect that the `application/x-smartbuf` is 
 based on another serialization: [SmartBuf](https://github.com/smartbuf/smartbuf-java)
 
-***SUMMARY: No additional configuration is required, this plugin will register `application/x-smartbuf` 
+**SUMMARY: No additional configuration is required, this plugin will register `application/x-smartbuf` 
 into `spring-mvc` automatically, it has no effect on normal `http` request, 
-and will be activated only if `accept` or `context-type` in the headers matche `application/x-smartbuf`.***
+and will be activated only if `accept` or `context-type` in the headers matche `application/x-smartbuf`.**
 
 # Demonstration
 
@@ -87,13 +87,15 @@ public interface DemoClient {
 When client uses `DemoClient` to invoke server's `DemoController`, 
 `feign` will send a request to server based on `consumes` and `produces`, the headers will like this:
 
-```http request
-=== MimeHeaders ===
-accept = **application/json**
-content-type = **application/json**
-user-agent = Java/1.8.0_191
-connection = keep-alive
-```
+>=== MimeHeaders ===
+>
+>accept = **application/json**
+>
+>content-type = **application/json**
+>
+>user-agent = Java/1.8.0_191
+>
+>connection = keep-alive
 
 The `spring-mvc` of server  will determine to use `application/json` to perform `input` decoding and `output` decoding 
 based on `accept` and `content-type` in the headers of request.   
@@ -119,13 +121,15 @@ Please pay attention to the changes in `consumes` and `produces`.
 After that, `feign` will use `application/x-smartbuf` to communicate with the server's `spring-mvc` automatically, 
 the headers will like this:
 
-```http request
-=== MimeHeaders ===
-accept = **application/x-smartbuf**
-content-type = **application/x-smartbuf**
-user-agent = Java/1.8.0_191
-connection = keep-alive
-```
+>=== MimeHeaders ===
+>
+>accept = **application/x-smartbuf**
+>
+>content-type = **application/x-smartbuf**
+>
+>user-agent = Java/1.8.0_191
+>
+>connection = keep-alive
 
 Even better, you can use `application/json` and `application/x-smartbuf` at the same time, like this:
 
