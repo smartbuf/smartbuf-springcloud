@@ -16,14 +16,14 @@ In `Java` ecosystem, it supports multiple `RPC` through the following plugins:
 
 The following is a detailed introduction of the `smartbuf-springcloud`.
 
-# `smartbuf-springcloud` Introduce
+# Introduce
 
 This plugin wraps `packet` mode of [`smartbuf`](https://github.com/smartbuf/smartbuf-java), 
 and exposes an `HTTP` message converter named `application/x-smartbuf` to `spring` via the custom `SmartbufMessageConverter`.
 
 This new `application/x-smartbuf` could provide better performance during data trasfer of complex object.
 
-# `application/x-smartbuf` Codec
+# `application/x-smartbuf`
 
 This plugin declares an `Auto-Configuration` named `SmartbufAutoConfiguration` in `META-INFO/spring.factories`.
 
@@ -140,7 +140,7 @@ public interface DemoClient {
 The client could use `application/json` to communicate with the server by invoke `helloJSON`,
 and use `application/x-smartbuf` by invoke `helloSmartbuf`.
 
-The server's `spring-mvc` will switch to correct converter automatically by the specified `accept` and `content-type`. 
+The server's `spring-mvc` will switch to correct converter automatically based on the specified `accept` and `content-type`. 
 
 You can `checkout` this project and find the whole example in `demo` submodule. 
 
@@ -177,6 +177,7 @@ its space utilization is not as good as `json` when dealing with simple data lik
 ```java
 @RestController
 public class DemoController {
+
     private UserModel user = xxx; // initialized at somewhere else
 
     @PostMapping("/getUser")
@@ -184,14 +185,15 @@ public class DemoController {
 }
 ```
 
-The `user` is a randomly assigned object for testing. 
-The specific model can be found in the `UserModel` class in the `demo` source.
+The `user` is a pre-allocated object for testing, 
+its model can be found in the `UserModel` class in the `demo` source.
 
-The client's `FeignClient` is defined as follows:
+The client's `FeignClient` is defined as following:
 
 ```java
 @FeignClient(name = "demo")
 public interface DemoClient {
+
     @PostMapping(value = "/getUser", consumes = "application/json", produces = "application/json")
     UserModel getUserJSON(@RequestParam("userId") Integer userId);
 
@@ -211,7 +213,6 @@ Network input(`bytes_input`) and output(`bytes_output`) are like this:
 
 We can see that the parameter `userId` is a single data type, 
 so the network traffic used by `json` and `smartbuf` is almost the same.
- 
 The return result `UserModel` is a more complex object, 
 and the `json` network resource consumption is nearly **3 times** of `smartbuf`.
 
@@ -225,6 +226,7 @@ network transmission time does not have much impact on the total time consumptio
 ```java
 @RestController
 public class DemoController {
+
     private List<PostModel> posts = xxx; // initialized at somewhere else
 
     @PostMapping("/queryPost")
@@ -240,6 +242,7 @@ The client's `FeignClient` is defined as follows:
 ```java
 @FeignClient(name = "demo")
 public interface DemoClient {
+
     @PostMapping(value = "/queryPost", consumes = "application/json", produces = "application/json")
     List<PostModel> queryPostJSON(@RequestParam("keyword") String keyword);
 
@@ -259,7 +262,6 @@ Network input(`bytes_input`) and output(`bytes_output`) are like this:
 
 We can see that the parameter `keyword` is a single `String`, 
 so the network traffic used by `json` and `smartbuf` is almost the same.
-
 The return result `List<PostModel>` is a large array of complex objects, 
 and the `json` network resource consumption is nearly **10 times** of `smartbuf`.
 
@@ -268,10 +270,10 @@ network transmission time does not have much impact on the total time consumptio
 
 # Summary
 
-When the `RPC` interface's input and output are very simple, `application/x-smartbuf` does not have any performance advantages.
+When the `RPC`'s input and output are very simple, `application/x-smartbuf` does not have any performance advantages.
 
-When the `RPC` interface's input and output are large data such as complex objects, arrays, collections.
-Using `application/x-smartbuf` could greatly reduce the bytecodes size of the network transmission. 
+When the `RPC`'s input and output are large data such as complex objects, arrays, collections.
+Using `application/x-smartbuf` could greatly reduce the bytes size of the network transmission. 
 For example, in the `queryPost` above, `application/x-smartbuf`'s network transmission is only **1/10** of `application/json`.
 
 What is commendable is that the `application/x-smartbuf` and `application/json` can coexist and seamleassly switch.
