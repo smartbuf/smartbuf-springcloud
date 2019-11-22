@@ -18,14 +18,14 @@ The following is a detailed introduction of the `smartbuf-springcloud`.
 
 # `smartbuf-springcloud` Introduce
 
-This plugins wraps `packet` mode of [`smartbuf`](https://github.com/smartbuf/smartbuf-java), 
-and exposes an `HTTP` message converter named `application/x-smartbuf` to `spring` container via the custom `SmartbufMessageConverter`.
+This plugin wraps `packet` mode of [`smartbuf`](https://github.com/smartbuf/smartbuf-java), 
+and exposes an `HTTP` message converter named `application/x-smartbuf` to `spring` via the custom `SmartbufMessageConverter`.
 
-This new `application/x-smartbuf` could provide better performance than `protobuf` during data trasfer of complex object.
+This new `application/x-smartbuf` could provide better performance during data trasfer of complex object.
 
 # `application/x-smartbuf` Codec
 
-This plugins declares an `Auto-Configuration` named `SmartbufAutoConfiguration` in `META-INFO/spring.factories`.
+This plugin declares an `Auto-Configuration` named `SmartbufAutoConfiguration` in `META-INFO/spring.factories`.
 
 `spring-boot` will scan and register it during initializing, it's fully automatic, no additional configuration is required.
 For more infomation, please refer to [SpringBoot Doc](https://docs.spring.io/autorepo/docs/spring-boot/2.0.0.M3/reference/html/boot-features-developing-auto-configuration.html)。
@@ -34,16 +34,15 @@ For more infomation, please refer to [SpringBoot Doc](https://docs.spring.io/aut
 it's a custom `HttpMessageConverter`, and its `MediaType` is `application/x-smartbuf`.
 
 `spring-mvc` will include this `SmartbufMessageConverter` into `messageConverters`, and uses it globally.
-If the header of the subsequent `http` request includes `accept: application/x-smartbuf` 
-or `content-type: application/x-smartbuf`, `spring-mvc` will use `SmartbufMessageConverter` to decode the request's input,
-and encode the request's output.
+If the headers of the subsequent `http` requests include `accept: application/x-smartbuf` or `content-type: application/x-smartbuf`, 
+`spring-mvc` will use `SmartbufMessageConverter` to decode its input, and encode its output.
 
 The whole process is similar to the implementation of `application/json`, expect that the `application/x-smartbuf` is 
 based on another serialization: [SmartBuf](https://github.com/smartbuf/smartbuf-java)
 
-***SUMMARY: No additional configuration is required, this plugin will register a message codec 
-named `application/x-smartbuf` into `spring-mvc` automatically, it has no effect on normal `http` request, 
-and will be activated only if `accept` or `context-type` in the header matches `application/x-smartbuf`.***
+***SUMMARY: No additional configuration is required, this plugin will register `application/x-smartbuf` 
+into `spring-mvc` automatically, it has no effect on normal `http` request, 
+and will be activated only if `accept` or `context-type` in the headers matche `application/x-smartbuf`.***
 
 # Demonstration
 
@@ -63,11 +62,12 @@ You could add `smartbuf-springcloud` dependency by the following `maven` configu
 
 ## Use `application/json`
 
-The `spring-cloud` layer uses `http` to communicate with the server's `spring-mvc`, the server's `controller` might like this:
+The `spring-cloud` layer uses `http` to communicate with the server's `spring-mvc`, the `controller` might like this:
 
 ```java
 @RestController
 public class DemoController {
+
     @PostMapping("/hello")
     public String sayHello(String name) { return "hello " + name; }
 }
@@ -78,21 +78,24 @@ The client could use this `FeignClient` to invoke server:
 ```java
 @FeignClient(name = "demo")
 public interface DemoClient {
+
     @PostMapping(value = "/hello", consumes = "application/json", produces = "application/json")
     String hello(@RequestParam("name") String name);
 }
 ```
 
-When client uses `DemoClient` to invoke server's `DemoController`, `feign` will send a request similar to this to the server
-based on `consumes` and `produces` declared in the `interface`:
+When client uses `DemoClient` to invoke server's `DemoController`, 
+`feign` will send a request to server based on `consumes` and `produces`, the headers will like this:
 
->=== MimeHeaders ===
->accept = **application/json**
->content-type = **application/json**
->user-agent = Java/1.8.0_191
->connection = keep-alive
+```http request
+=== MimeHeaders ===
+accept = **application/json**
+content-type = **application/json**
+user-agent = Java/1.8.0_191
+connection = keep-alive
+```
 
-The server's `spring-mvc` will determine to use `application/json` to perform `input` decoding and `output` decoding 
+The `spring-mvc` of server  will determine to use `application/json` to perform `input` decoding and `output` decoding 
 based on `accept` and `content-type` in the headers of request.   
 
 ## Use `application/x-smartbuf`
@@ -105,6 +108,7 @@ To use `application/x-smartbuf`, you just need to change `DemoClient` like this:
 ```java
 @FeignClient(name = "demo")
 public interface DemoClient {
+
     @PostMapping(value = "/hello", consumes = "application/x-smartbuf", produces = "application/x-smartbuf")
     String hello(@RequestParam("name") String name);
 }
@@ -112,20 +116,23 @@ public interface DemoClient {
 
 Please pay attention to the changes in `consumes` and `produces`.
 
-After this, `feign` will use `application/x-smartbuf` to communicate with the server's `spring-mvc`, 
+After that, `feign` will use `application/x-smartbuf` to communicate with the server's `spring-mvc` automatically, 
 the headers will like this:
 
->=== MimeHeaders ===
->accept = **application/x-smartbuf**
->content-type = **application/x-smartbuf**
->user-agent = Java/1.8.0_191
->connection = keep-alive
+```http request
+=== MimeHeaders ===
+accept = **application/x-smartbuf**
+content-type = **application/x-smartbuf**
+user-agent = Java/1.8.0_191
+connection = keep-alive
+```
 
 Even better, you can use `application/json` and `application/x-smartbuf` at the same time, like this:
 
 ```java
 @FeignClient(name = "demo")
 public interface DemoClient {
+
     @PostMapping(value = "/hello", consumes = "application/json", produces = "application/json")
     String helloJSON(@RequestParam("name") String name);
 
@@ -137,7 +144,7 @@ public interface DemoClient {
 The client could use `application/json` to communicate with the server by invoke `helloJSON`,
 and use `application/x-smartbuf` by invoke `helloSmartbuf`.
 
-The server's `spring-mvc` will switch the correct converter automatically by the specified `accept` and `content-type`. 
+The server's `spring-mvc` will switch to correct converter automatically by the specified `accept` and `content-type`. 
 
 You can `checkout` this project and find the whole example in `demo` submodule. 
 
