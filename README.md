@@ -87,14 +87,10 @@ public interface DemoClient {
 When client uses `DemoClient` to invoke server's `DemoController`, 
 `feign` will send a request to server based on `consumes` and `produces`, the headers will like this:
 
->=== MimeHeaders ===
->
->accept = **application/json**
->
->content-type = **application/json**
->
->user-agent = Java/1.8.0_191
->
+>=== MimeHeaders ===  
+>accept = **application/json**  
+>content-type = **application/json**  
+>user-agent = Java/1.8.0_191  
 >connection = keep-alive
 
 The `spring-mvc` of server  will determine to use `application/json` to perform `input` decoding and `output` decoding 
@@ -121,14 +117,10 @@ Please pay attention to the changes in `consumes` and `produces`.
 After that, `feign` will use `application/x-smartbuf` to communicate with the server's `spring-mvc` automatically, 
 the headers will like this:
 
->=== MimeHeaders ===
->
->accept = **application/x-smartbuf**
->
->content-type = **application/x-smartbuf**
->
->user-agent = Java/1.8.0_191
->
+>=== MimeHeaders ===  
+>accept = **application/x-smartbuf**  
+>content-type = **application/x-smartbuf**  
+>user-agent = Java/1.8.0_191  
 >connection = keep-alive
 
 Even better, you can use `application/json` and `application/x-smartbuf` at the same time, like this:
