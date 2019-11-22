@@ -1,50 +1,57 @@
-# smartbuf-springcloud  [![Travis CI](https://travis-ci.org/smartbuf/smartbuf-dubbo.svg?branch=master)](https://travis-ci.org/smartbuf/smartbuf-dubbo)
+# smartbuf-springcloud  [![Travis CI](https://travis-ci.org/smartbuf/smartbuf-springcloud.svg?branch=master)](https://travis-ci.org/smartbuf/smartbuf-springcloud)
 
-`smartbuf-springcloud`是一个基于`smartbuf`的`spring-cloud`序列化插件。
+[中文文档](https://sulin.me/2019/JGDXHH.html)
 
-# [SmartBuf](https://github.com/smartbuf/smartbuf-java)介绍
+`smartbuf-springcloud` is a `spring-cloud` serialization plugin based on `smartbuf`.
 
-`smartbuf`是一种新颖、高效、智能、易用的跨语言序列化框架，它既拥有不亚于protobuf的高性能， 也拥有与json相仿的通用性、可扩展性、可调试性等。
+# [SmartBuf](https://github.com/smartbuf/smartbuf-java) Introduce
 
-在`Java`语言生态中，它通过以下插件支持多种`RPC`框架:
+`smartbuf` is a novel, efficient, intelligent and easy-to-use cross-language serialization framework. 
+It has the same high performance as `protobuf`, and has the same versatility, scalability and flexibility as `json`. 
 
- + [`smartbuf-dubbo`](https://github.com/smartbuf/smartbuf-dubbo): 为`dubbo`提供了`stream`模式的序列化扩展插件
- + [`smartbuf-springcloud`]((https://github.com/smartbuf/smartbuf-springcloud)): 为`spring-cloud`提供了`packet`模式的序列化扩展插件
+In `Java` ecosystem, it supports multiple `RPC` through the following plugins:
 
-# `smartbuf-springcloud`介绍
+ + [`smartbuf-dubbo`](https://github.com/smartbuf/smartbuf-dubbo): Provides a serialization plugin in `stream` mode for `dubbo`.
+ + [`smartbuf-springcloud`](https://github.com/smartbuf/smartbuf-springcloud): Provides a serialization plugin in `packet` mode for `spring-cloud`.
 
-它内部封装了[`smartbuf`](https://github.com/smartbuf/smartbuf-java)序列化框架的`packet`模式，
-通过自定义的`SmartbufMessageConverter`向`spring`容器中暴露了一个名为`application/x-smartbuf`的`HTTP`消息编码解码器。
+The following is a detailed introduction of the `smartbuf-springcloud`.
 
-这个新增的`application/x-smartbuf`格式在复杂对象的数据传输过程中，可以提供不亚于`protobuf`的高性能。
+# `smartbuf-springcloud` Introduce
 
-# `application/x-smartbuf`
+This plugins wraps `packet` mode of [`smartbuf`](https://github.com/smartbuf/smartbuf-java), 
+and exposes an `HTTP` message converter named `application/x-smartbuf` to `spring` container via the custom `SmartbufMessageConverter`.
 
-`smartbuf-springcloud`源代码中有一个名为的`META-INFO/spring.factories`的配置文件，
-它提供了一个名为`SmartbufAutoConfiguration`的自定义`Auto-Configuration`，
-`spring-boot`初始化时会主动扫描并注册它，因此不需要你做任何额外的配置。
-更多资料请参考[SpringBoot文档](https://docs.spring.io/autorepo/docs/spring-boot/2.0.0.M3/reference/html/boot-features-developing-auto-configuration.html)。
+This new `application/x-smartbuf` could provide better performance than `protobuf` during data trasfer of complex object.
 
-`SmartbufAutoConfiguration`会向`spring`容器中增加一个新的`SmartbufMessageConverter`对象，
-它是一个自定义的`HttpMessageConverter`，它的`MediaType`是`application/x-smartbuf`。
+# `application/x-smartbuf` Codec
 
-`spring-mvc`启动后会把这个新增的`HttpMessageConverter`加入`messageConverters`中，
-如果后续`http`请求的头信息中包括`accept: application/x-smartbuf`或`content-type: application/x-smartbuf`，
-则`spring-mvc`会将该请求的`OutputStream`编码或`InputStream`解码委托给`SmartbufMessageConverter`处理。
+This plugins declares an `Auto-Configuration` named `SmartbufAutoConfiguration` in `META-INFO/spring.factories`.
 
-整个过程和`application/json`的实现原理类似，不同之处在于`application/x-smartbuf`底层采用了另外一种序列化方案: 
-[SmartBuf](https://github.com/smartbuf/smartbuf-java)
+`spring-boot` will scan and register it during initializing, it's fully automatic, no additional configuration is required.
+For more infomation, please refer to [SpringBoot Doc](https://docs.spring.io/autorepo/docs/spring-boot/2.0.0.M3/reference/html/boot-features-developing-auto-configuration.html)。
 
-***总结：你不需要做任何额外的配置，此插件会自动向`spring-mvc`中注册一个名为`application/x-smartbuf`的数据编码解码器，
-它对于正常的`http`请求没有任何影响，只有指定了`accept`或`content-type`头信息采用激活它***
+`SmartbufAutoConfiguration` will add a new `SmartbufMessageConverter` instance into `spring` container, 
+it's a custom `HttpMessageConverter`, and its `MediaType` is `application/x-smartbuf`.
 
-# 实例演示
+`spring-mvc` will include this `SmartbufMessageConverter` into `messageConverters`, and uses it globally.
+If the header of the subsequent `http` request includes `accept: application/x-smartbuf` 
+or `content-type: application/x-smartbuf`, `spring-mvc` will use `SmartbufMessageConverter` to decode the request's input,
+and encode the request's output.
 
-本章节通过一个实例，介绍如何将`smartbuf-springcloud`引入自己的工程中，以及如何在代码中使用它。
+The whole process is similar to the implementation of `application/json`, expect that the `application/x-smartbuf` is 
+based on another serialization: [SmartBuf](https://github.com/smartbuf/smartbuf-java)
 
-## 增加Maven依赖
+***SUMMARY: No additional configuration is required, this plugin will register a message codec 
+named `application/x-smartbuf` into `spring-mvc` automatically, it has no effect on normal `http` request, 
+and will be activated only if `accept` or `context-type` in the header matches `application/x-smartbuf`.***
 
-你可以通过以下`maven`坐标添加`smartbuf-springcloud`的依赖：
+# Demonstration
+
+This chapter introduces how to add and use `smartbuf-springcloud` into your project with a simple example.
+
+## Add Maven Dependency
+
+You could add `smartbuf-springcloud` dependency by the following `maven` configuration:
 
 ```xml
 <dependency>
@@ -54,9 +61,9 @@
 </dependency>
 ```
 
-## 使用`application/json`通信
+## Use `application/json`
 
-众所周知，`feign`底层使用`http`与服务端的`spring-mvc`进行通信。以实际举例，服务端的Controller可能类似这样：
+The `spring-cloud` layer uses `http` to communicate with the server's `spring-mvc`, the server's `controller` might like this:
 
 ```java
 @RestController
@@ -66,7 +73,7 @@ public class DemoController {
 }
 ```
 
-调用方可以通过声明这样的`FeignClient`与之通信：
+The client could use this `FeignClient` to invoke server:
 
 ```java
 @FeignClient(name = "demo")
@@ -76,25 +83,24 @@ public interface DemoClient {
 }
 ```
 
-调用方通过这个`DemoClient`请求服务端的`DemoController`时，
-`feign`会根据接口中声明的`consumes`和`produces`，向服务端发送类似于这样的请求：
+When client uses `DemoClient` to invoke server's `DemoController`, `feign` will send a request similar to this to the server
+based on `consumes` and `produces` declared in the `interface`:
 
-```text
-=== MimeHeaders ===
-accept = application/json
-content-type = application/json
-user-agent = Java/1.8.0_191
-connection = keep-alive
-```
+>=== MimeHeaders ===
+>accept = **application/json**
+>content-type = **application/json**
+>user-agent = Java/1.8.0_191
+>connection = keep-alive
 
-服务端的`spring-mvc`会根据头信息中的`accept`和`content-type`，确定使用`application/json`来执行`input`的解码和`output`的编码。
+The server's `spring-mvc` will determine to use `application/json` to perform `input` decoding and `output` decoding 
+based on `accept` and `content-type` in the headers of request.   
 
-## 使用`application/x-smartbuf`替换`application/json`
+## Use `application/x-smartbuf`
 
-如前文所言，`smartbuf-springcloud`会自动向`spring-mvc`中注册一个名为`application/x-smartbuf`的编码解码器，
-因此在引入`maven`依赖之后，不需要做任何额外的配置。
+As mentioned earily, `smartbuf-springcloud` will automatically register a codec named `application/x-smartbuf` into `spring-mvc`,
+so after add the `maven` dependency, no additional configuration is required.
 
-你只需要将`DemoClient`修改为这样，注意`consumes`和`produces`的变化:
+To use `application/x-smartbuf`, you just need to change `DemoClient` like this: 
 
 ```java
 @FeignClient(name = "demo")
@@ -104,17 +110,18 @@ public interface DemoClient {
 }
 ```
 
-改动之后，`feign`就会使用新的`application/x-smartbuf`方式来与服务端`spring-mvc`进行通信，此时头信息就类似这样：
+Please pay attention to the changes in `consumes` and `produces`.
 
-```text
-=== MimeHeaders ===
-accept = application/x-smartbuf
-content-type = application/x-smartbuf
-user-agent = Java/1.8.0_191
-connection = keep-alive
-```
+After this, `feign` will use `application/x-smartbuf` to communicate with the server's `spring-mvc`, 
+the headers will like this:
 
-更妙的是，你可以同时创建两个方法，让`application/json`与`application/x-smartbuf`共存：
+>=== MimeHeaders ===
+>accept = **application/x-smartbuf**
+>content-type = **application/x-smartbuf**
+>user-agent = Java/1.8.0_191
+>connection = keep-alive
+
+Even better, you can use `application/json` and `application/x-smartbuf` at the same time, like this:
 
 ```java
 @FeignClient(name = "demo")
@@ -127,38 +134,42 @@ public interface DemoClient {
 }
 ```
 
-客户端可以通过`helloJSON`使用`application/json`编码方式，通过`helloSmartbuf`使用`application/x-smartbuf`编码方式，
-而服务端会根据请求方指定的编码类型自动进行切换。
+The client could use `application/json` to communicate with the server by invoke `helloJSON`,
+and use `application/x-smartbuf` by invoke `helloSmartbuf`.
 
-具体演示代码在此工程的`demo`子模块中，你可以直接`checkout`到本地执行。
+The server's `spring-mvc` will switch the correct converter automatically by the specified `accept` and `content-type`. 
 
-# 性能对比
+You can `checkout` this project and find the whole example in `demo` submodule. 
 
-`smartbuf`的优点在于其分区序列化所带来的高压缩率，尤其是面对复杂对象、数组时，它的空间利用率远超其他序列化方案。
+# Performance Comparison
 
-对于RPC而言，序列化耗时往往是纳秒级，而逻辑处理、数据传输往往是毫秒级的，因此以下测试将采用单线程测试相同接口、相同次数的调用下，
-`json`与`smartbuf`的数据传输量和耗时的差别。
+The advantage of `smartbuf` is the high compression ratio brought by its partition serialization, 
+especially when it comes to complex objects and arrays, its space utilization is far superior to other serialization schemes.
 
-下面我们通过三个不同类型的接口测试一下`json`与`smartbuf`的区别。
+For RPC, the serialization time is often nanoseconds, 
+while the logical processing and network transmission are often in the order of milliseconds.
+Therefore, the following test will use a single thread to performing test.
 
-## `hello`测试
+Below we test the difference between `json` and `smartbuf` through three different types of `api`.
 
-`hello`即前文提到的`helloJson`和`helloSmartbuf`接口，输入输出参数都是`String`，接口内部代码逻辑非常简单。
+## `hello` Comparison
 
-单线程循环调用`400,000`次总耗时分别为：
+`hello` is the `helloJson` and `helloSmartbuf` mentioned above. 
+The input and output parameters are `String`, its internal logic is very simple, `400,000` times requests will cost:
 
- + `JSON`: **169秒**
- + `SmartBuf`: **170秒**
+ + `JSON`: **169s**
+ + `SmartBuf`: **170s**
 
-网络输入(`bytes_input`)输出(`bytes_output`)总量分别为：
+Network input(`bytes_input`) and output(`bytes_output`) are like this:
 
-![hello-bytes](./doc/imgs/springcloud-hello.png)
+![hello-bytes](https://github.com/smartbuf/smartbuf-springcloud/raw/master/doc/imgs/springcloud-hello.png)
 
-可以看到`json`与`smartbuf`的差别非常小，由于`smartbuf`需要额外几个字节描述数据信息，因此网络流量稍微多了一点点。
+Since `smartbuf` encoding requires an few extra bytes to describe the complete data information, 
+its space utilization is not as good as `json` when dealing with simple data like `String`.
 
-## `getUser`测试
+## `getUser` Comparison
 
-`getUser`接口的实现方式如下：
+`getUser`'s implementation is like this:
 
 ```java
 @RestController
@@ -170,9 +181,10 @@ public class DemoController {
 }
 ```
 
-其中`user`是一个专门用于测试的、随机分配的对象，其具体模型可以查阅源码中的`UserModel`类。
+The `user` is a randomly assigned object for testing. 
+The specific model can be found in the `UserModel` class in the `demo` source.
 
-客户端、调用方的`FeignClient`定义如下：
+The client's `FeignClient` is defined as follows:
 
 ```java
 @FeignClient(name = "demo")
@@ -185,23 +197,27 @@ public interface DemoClient {
 }
 ```
 
-单线程循环调用`300,000`次的总耗时分别为：
+`300,000` times invocation will cost:
 
- + `JSON`: **162秒**
- + `SmartBuf`: **149秒**
+ + `JSON`: **162s**
+ + `SmartBuf`: **149s**
 
-网络输入(`bytes_input`)输出(`bytes_output`)总量分别为：
+Network input(`bytes_input`) and output(`bytes_output`) are like this:
 
-![getUser-bytes](./doc/imgs/springcloud-getUser.png)
+![getUser-bytes](https://github.com/smartbuf/smartbuf-springcloud/raw/master/doc/imgs/springcloud-getUser.png)
 
-可以看到请求参数`userId`数据类型单一，因此`json`和`smartbuf`所使用的网络流量几乎一样。
-而返回结果`UserModel`是一个比较复杂的对象，因此`json`网络资源消耗量是`smartbuf`的将近**三倍**。
+We can see that the parameter `userId` is a single data type, 
+so the network traffic used by `json` and `smartbuf` is almost the same.
+ 
+The return result `UserModel` is a more complex object, 
+and the `json` network resource consumption is nearly **3 times** of `smartbuf`.
 
-因为测试环境为`localhost`，网络传输耗时对接口的耗时没有太大影响。
+Because the test environment is `localhost`, 
+network transmission time does not have much impact on the total time consumption of the interface.
 
-## `queryPost`测试
+## `queryPost` Comparison
 
-`queryPost`接口的实现方式如下：
+`queryPost`'s implementation is like this:
 
 ```java
 @RestController
@@ -213,9 +229,10 @@ public class DemoController {
 }
 ```
 
-此接口返回值`posts`是一个预先分配的、用于测试的`PostModel`数组，此数组长度为固定的`100`，其具体模型及初始化可以查阅源码。
+The return value `posts` is a pre-allocated `PostModel` array for testing. 
+Its length is fixed `100`. its model and initialization can be found in the `demo` source.
 
-客户端、调用方的`FeignClient`定义如下：
+The client's `FeignClient` is defined as follows:
 
 ```java
 @FeignClient(name = "demo")
@@ -228,30 +245,39 @@ public interface DemoClient {
 }
 ```
 
-单线程循环调用`100,000`次的总耗时分别为：
+`100,000` times invocation will cost:
 
- + `JSON`: **195秒**
- + `SmartBuf`: **155秒**
+ + `JSON`: **195s**
+ + `SmartBuf`: **155s**
 
-网络输入(`bytes_input`)输出(`bytes_output`)总量分别为：
+Network input(`bytes_input`) and output(`bytes_output`) are like this:
 
-![queryPost-bytes](./doc/imgs/springcloud-queryPost.png)
+![queryPost-bytes](https://github.com/smartbuf/smartbuf-springcloud/raw/master/doc/imgs/springcloud-queryPost.png)
 
-可以看到请求参数`keyword`数据类型单一，因此`json`和`smartbuf`所使用的网络流量几乎一样。
-而返回结果`List<PostModel>`是一个复杂对象的大数组，因此`json`网络资源消耗量是`smartbuf`的将近**十倍**。
+We can see that the parameter `keyword` is a single `String`, 
+so the network traffic used by `json` and `smartbuf` is almost the same.
 
-因为测试环境为`localhost`，网络传输耗时对接口的耗时没有太大影响。
+The return result `List<PostModel>` is a large array of complex objects, 
+and the `json` network resource consumption is nearly **10 times** of `smartbuf`.
 
-# 总结
+Because the test environment is `localhost`, 
+network transmission time does not have much impact on the total time consumption of the interface.
 
-在输入输出数据格式都非常简单的`RPC`接口调用中，此插件所提供的`application/x-smartbuf`编码没有任何性能优势。
+# Summary
 
-当接口数据中存在复杂对象、数组、集合等较大数据时，使用`x-smartbuf`可以大幅降低接口输入输出的字节流大小，
-比如在上文`queryPost`测试中，使用`x-smartbuf`时网络输入输出字节总量仅为`json`的**十分之一**。
+When the `RPC` interface's input and output are very simple, `application/x-smartbuf` does not have any performance advantages.
 
-难能可贵的是，实际应用中`x-smartbuf`与`json`即可以共存，也可以无缝切换。
-比如对于某些简单接口，可以直接采用简单的`json`编码，而对于数据量比较大的复杂接口，可以采用高效率的`x-smartbuf`编码进行性能优化。
-再比如需要开发测试时使用`json`编码，生产环境发布时再采用`x-smartbuf`编码。
+When the `RPC` interface's input and output are large data such as complex objects, arrays, collections.
+Using `application/x-smartbuf` could greatly reduce the bytecodes size of the network transmission. 
+For example, in the `queryPost` above, `application/x-smartbuf`'s network transmission is only **1/10** of `application/json`.
+
+What is commendable is that the `application/x-smartbuf` and `application/json` can coexist and seamleassly switch.
+
+For example, you can use `application/json` directly for some simple `api`, 
+and use the efficient `application/x-smartbuf` for complex `api` with large object to achieve better performance.
+
+For example, you can use `application/json` during development and test,
+and switch to `application/x-smartbuf` when going online.
 
 # License
 
